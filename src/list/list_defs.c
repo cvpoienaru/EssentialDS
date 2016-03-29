@@ -83,16 +83,14 @@ void free_eds_linked_list(
 		return;
 
 	if((*list)->start && (*list)->end) {
-		if((*list)->start != (*list)->end) {
-			crt = (*list)->start;
-			while(crt != (*list)->end) {
-				tmp = crt;
-				crt = crt->next;
-				free_eds_linked_list_node(&tmp, free_function);
-			}
+		crt = (*list)->start;
+		while(crt != (*list)->end) {
+			tmp = crt;
+			crt = crt->next;
+			free_eds_linked_list_node(&tmp, free_function);
 		}
 
-		free_eds_linked_list_node(&(*list)->end, free_function);
+		free_eds_linked_list_node(&crt, free_function);
 	}
 
 	free(*list);
