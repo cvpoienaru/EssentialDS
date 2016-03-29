@@ -26,8 +26,10 @@
  */
 
 #include <list/list.h>
-#include <list/list_defs.h>
 #include <defs.h>
+#include <list/array_list.h>
+#include <list/linked_list.h>
+#include <list/list_defs.h>
 
 #include <stdlib.h>
 
