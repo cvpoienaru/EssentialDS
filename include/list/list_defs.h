@@ -25,8 +25,8 @@
  * possibility of such damage.
  */
 
-#ifndef EDS_LIST_H_
-#define EDS_LIST_H_
+#ifndef EDS_DEFS_LIST_H_
+#define EDS_DEFS_LIST_H_
 
 typedef (*free_eds_data)(void **data);
 
@@ -53,11 +53,17 @@ union eds_list_container {
 struct eds_linked_list_node* alloc_eds_linked_list_node(void);
 void free_eds_linked_list_node(
 	struct eds_linked_list_node **node,
-	free_eds_data free_function);
+	const free_eds_data free_function);
 
 struct eds_linked_list* alloc_eds_linked_list(void);
 void free_eds_linked_list(
 	struct eds_linked_list **list,
-	free_eds_data free_function);
+	const free_eds_data free_function);
 
-#endif /* EDS_LIST_H_ */
+struct eds_array_list* alloc_eds_array_list(const int initial_size);
+void free_eds_array_list(
+	struct eds_array_list **list,
+	const int size,
+	const free_eds_data free_function);
+
+#endif /* EDS_DEFS_LIST_H_ */

@@ -25,8 +25,8 @@
  * possibility of such damage.
  */
 
-#include "list/list_defs.h"
-#include "defs.h"
+#include <list/list_defs.h>
+#include <defs.h>
 
 struct eds_linked_list_node* alloc_eds_linked_list_node(void)
 {
@@ -46,7 +46,7 @@ struct eds_linked_list_node* alloc_eds_linked_list_node(void)
 
 void free_eds_linked_list_node(
 	struct eds_linked_list_node **node,
-	free_eds_data free_function)
+	const free_eds_data free_function)
 {
 	if(!node || !(*node))
 		return;
@@ -74,7 +74,7 @@ struct eds_linked_list* alloc_eds_linked_list(void)
 
 void free_eds_linked_list(
 	struct eds_linked_list **list,
-	free_eds_data free_function)
+	const free_eds_data free_function)
 {
 	struct eds_linked_list_node *crt = NULL;
 	struct eds_linked_list_node *tmp = NULL;
@@ -91,6 +91,55 @@ void free_eds_linked_list(
 		}
 
 		free_eds_linked_list_node(&crt, free_function);
+	}
+
+	free(*list);
+	*list = NULL;
+}
+
+struct eds_array_list* alloc_eds_array_list(const int initial_size)
+{
+	int status = EDS_FAILURE;
+	struct eds_array_list *list = NULL;
+
+	if(initial_size < 0)
+		goto exit;
+
+	list = (struct eds_array_list*)malloc(sizeof(struct eds_array_list));
+	if(!list)
+		goto exit;
+
+	list->data = (void**)malloc(initial_size * sizeof(void*));
+	if(!list->data)
+		goto exit;
+
+	status = EDS_SUCCESS;
+
+exit:
+	if(status == EDS_FAILURE)
+		free_eds_array_list(&list, initial_size, NULL);
+	return list;
+}
+
+void free_eds_array_list(
+	struct eds_array_list **list,
+	const int size,
+	const free_eds_data free_function)
+{
+	int i;
+
+	if(!list || !(*list))
+		return;
+
+	if((*list)->data) {
+		if(free_function) {
+			for(i = 0; i < size; ++i) {
+				if((*list)->data[i])
+					free_function((*list)->data[i]);
+			}
+		}
+
+		free((*list)->data);
 	}
 
 	free(*list);

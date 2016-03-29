@@ -28,13 +28,25 @@
 #ifndef EDS_LIST_H_
 #define EDS_LIST_H_
 
-#include "list/list_defs.h"
+#include <list/list_defs.h>
+
+#define EDS_INITIAL_SIZE 0
+
+#define EDS_NO_LIST_TYPE 0
+#define EDS_LINKED_LIST_TYPE 1
+#define EDS_ARRAY_LIST_TYPE 2
 
 struct eds_list {
 	int type;
 	int items_used;
 	int items_allocated;
+	free_eds_data free_function;
 	union eds_list_container *container;
 };
+
+const int is_eds_list_type_valid(const int type);
+
+struct eds_list* alloc_eds_list(const int type);
+void free_eds_list(struct eds_list **list);
 
 #endif /* EDS_LIST_H_ */
