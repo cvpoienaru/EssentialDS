@@ -25,10 +25,10 @@
  * possibility of such damage.
  */
 
-#ifndef EDS_DEFS_LIST_H_
-#define EDS_DEFS_LIST_H_
+#ifndef EDS_LIST_DEFS_H_
+#define EDS_LIST_DEFS_H_
 
-typedef (*free_eds_data)(void **data);
+#include <defs.h>
 
 struct eds_linked_list_node {
 	struct eds_linked_list_node *prev;
@@ -66,4 +66,4 @@ void free_eds_array_list(
 	const int size,
 	const free_eds_data free_function);
 
-#endif /* EDS_DEFS_LIST_H_ */
+#endif /* EDS_LIST_DEFS_H_ */

@@ -28,6 +28,8 @@
 #include <list/list_defs.h>
 #include <defs.h>
 
+#include <stdlib.h>
+
 struct eds_linked_list_node* alloc_eds_linked_list_node(void)
 {
 	struct eds_linked_list_node *node = NULL;

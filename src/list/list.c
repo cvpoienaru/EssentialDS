@@ -29,6 +29,8 @@
 #include <list/list_defs.h>
 #include <defs.h>
 
+#include <stdlib.h>
+
 const int is_eds_list_type_valid(const int type)
 {
 	switch(type) {

@@ -29,6 +29,7 @@
 #define EDS_LIST_H_
 
 #include <list/list_defs.h>
+#include <defs.h>
 
 #define EDS_INITIAL_SIZE 0
 
