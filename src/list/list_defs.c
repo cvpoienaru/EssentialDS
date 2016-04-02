@@ -263,7 +263,7 @@ void eds_free_list_container(
 	*container = NULL;
 }
 
-const int eds_is_list_type_valid(const int type)
+inline const int eds_is_list_type_valid(const int type)
 {
 	switch(type) {
 		case EDS_NO_LIST_TYPE:

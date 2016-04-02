@@ -88,6 +88,6 @@ void eds_free_list_container(
 	struct eds_list_container **container,
 	const eds_free_data free_function);
 
-const int eds_is_list_type_valid(const int type);
+inline const int eds_is_list_type_valid(const int type);
 
 #endif /* EDS_LIST_DEFS_H_ */
