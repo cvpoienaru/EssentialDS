@@ -26,6 +26,7 @@
 
 # Directory structure
 export EDS_ROOT=~/Projects/EssentialDS
+export EDS_BIN=$EDS_ROOT/bin
 export EDS_INCLUDE=$EDS_ROOT/include
 export EDS_LIB=$EDS_ROOT/lib
 export EDS_SCRIPT=$EDS_ROOT/script

@@ -30,3 +30,114 @@
 #include <list/list_defs.h>
 
 #include <stdlib.h>
+
+static const int eds_add_general_linked_list(
+	struct eds_linked_list *list,
+	struct eds_linked_list_node *node,
+	void *data,
+	const int add_mode)
+{
+	int ret = EDS_FAILURE;
+	struct eds_linked_list_node *crt = NULL;
+
+	crt = eds_alloc_linked_list_node();
+	if(!crt)
+		goto exit;
+
+	crt->data = data;
+
+	if(!list->start && !list->end) {
+		list->start = crt;
+		list->end = crt;
+		goto first_node_exit;
+	}
+
+	switch(add_mode) {
+		case EDS_ADD_BEFORE_LIST_MODE:
+			if(list->start == node)
+				list->start = crt;
+
+			crt->prev = node->prev;
+			crt->next = node;
+			node->prev = crt;
+			if(crt->prev)
+				crt->prev->next = crt;
+			break;
+
+		case EDS_ADD_AFTER_LIST_MODE:
+			if(list->end == node)
+				list->end = crt;
+
+			crt->next = node->next;
+			crt->prev = node;
+			node->next = crt;
+			if(crt->next)
+				crt->next->prev = crt;
+			break;
+
+		default:
+			goto exit;
+	}
+
+first_node_exit:
+	++(list->base->items_allocated);
+	list->base->items_used = list->base->items_allocated;
+
+	ret = EDS_SUCCESS;
+
+exit:
+	return ret;
+}
+
+const int eds_add_before_linked_list(
+	struct eds_linked_list *list,
+	struct eds_linked_list_node *node,
+	void *data)
+{
+	if(!list)
+		return EDS_FAILURE;
+
+	if(!node)
+		return EDS_FAILURE;
+
+	return eds_add_general_linked_list(
+		list,
+		node,
+		data,
+		EDS_ADD_BEFORE_LIST_MODE);
+}
+
+const int eds_add_after_linked_list(
+	struct eds_linked_list *list,
+	struct eds_linked_list_node *node,
+	void *data)
+{
+	if(!list)
+		return EDS_FAILURE;
+
+	if(!node)
+		return EDS_FAILURE;
+
+	return eds_add_general_linked_list(
+		list,
+		node,
+		data,
+		EDS_ADD_AFTER_LIST_MODE);
+}
+
+const int eds_add_first_linked_list(
+	struct eds_linked_list *list,
+	void *data)
+{
+	if(!list)
+		return EDS_FAILURE;
+
+	return eds_add_before_linked_list(list, list->start, data);
+}
+
+const int eds_add_last_linked_list(
+	struct eds_linked_list *list,
+	void  *data)
+{
+	return eds_add_after_linked_list(list, list->end, data);
+}

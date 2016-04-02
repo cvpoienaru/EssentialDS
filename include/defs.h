@@ -36,6 +36,6 @@
 #define FALSE 0
 #define TRUE !(FALSE)
 
-typedef (*free_eds_data)(void **data);
+typedef void (*eds_free_data)(void **data);
 
 #endif /* EDS_DEFS_H_ */

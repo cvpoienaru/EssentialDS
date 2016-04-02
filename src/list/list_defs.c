@@ -30,7 +30,30 @@
 
 #include <stdlib.h>
 
-struct eds_linked_list_node* alloc_eds_linked_list_node(void)
+struct eds_list_base* eds_alloc_list_base(void)
+{
+	struct eds_list_base *base = NULL;
+
+	base = (struct eds_list_base*)malloc(sizeof(struct eds_list_base));
+	if(!base)
+		return base;
+
+	base->items_used = 0;
+	base->items_allocated = 0;
+
+	return base;
+}
+
+void eds_free_list_base(struct eds_list_base **base)
+{
+	if(!base || !(*base))
+		return;
+
+	free(*base);
+	*base = NULL;
+}
+
+struct eds_linked_list_node* eds_alloc_linked_list_node(void)
 {
 	struct eds_linked_list_node *node = NULL;
 
@@ -46,37 +69,47 @@ struct eds_linked_list_node* alloc_eds_linked_list_node(void)
 	return node;
 }
 
-void free_eds_linked_list_node(
+void eds_free_linked_list_node(
 	struct eds_linked_list_node **node,
-	const free_eds_data free_function)
+	const eds_free_data free_function)
 {
 	if(!node || !(*node))
 		return;
 
-	if(free_function)
+	if(free_function && (*node)->data)
 		free_function(&(*node)->data);
 
 	free(*node);
 	*node = NULL;
 }
 
-struct eds_linked_list* alloc_eds_linked_list(void)
+struct eds_linked_list* eds_alloc_linked_list(void)
 {
+	int status = EDS_FAILURE;
 	struct eds_linked_list *list = NULL;
 
 	list = (struct eds_linked_list*)malloc(sizeof(struct eds_linked_list));
 	if(!list)
-		return list;
+		goto exit;
+
+	list->base = eds_alloc_list_base();
+	if(!list->base)
+		goto exit;
 
 	list->start = NULL;
 	list->end = NULL;
 
+	status = EDS_SUCCESS;
+
+exit:
+	if(list && status == EDS_FAILURE)
+		eds_free_linked_list(&list, NULL);
 	return list;
 }
 
-void free_eds_linked_list(
+void eds_free_linked_list(
 	struct eds_linked_list **list,
-	const free_eds_data free_function)
+	const eds_free_data free_function)
 {
 	struct eds_linked_list_node *crt = NULL;
 	struct eds_linked_list_node *tmp = NULL;
@@ -89,17 +122,20 @@ void free_eds_linked_list(
 		while(crt != (*list)->end) {
 			tmp = crt;
 			crt = crt->next;
-			free_eds_linked_list_node(&tmp, free_function);
+			eds_free_linked_list_node(&tmp, free_function);
 		}
 
-		free_eds_linked_list_node(&crt, free_function);
+		eds_free_linked_list_node(&crt, free_function);
 	}
+
+	if((*list)->base)
+		eds_free_list_base(&(*list)->base);
 
 	free(*list);
 	*list = NULL;
 }
 
-struct eds_array_list* alloc_eds_array_list(const int initial_size)
+struct eds_array_list* eds_alloc_array_list(const int initial_size)
 {
 	int status = EDS_FAILURE;
 	struct eds_array_list *list = NULL;
@@ -111,22 +147,28 @@ struct eds_array_list* alloc_eds_array_list(const int initial_size)
 	if(!list)
 		goto exit;
 
+	list->base = eds_alloc_list_base();
+	if(!list->base)
+		goto exit;
+
 	list->data = (void**)malloc(initial_size * sizeof(void*));
 	if(!list->data)
 		goto exit;
 
+	list->base->items_allocated = initial_size;
+
 	status = EDS_SUCCESS;
 
 exit:
-	if(status == EDS_FAILURE)
-		free_eds_array_list(&list, initial_size, NULL);
+	if(list && status == EDS_FAILURE)
+		eds_free_array_list(&list, initial_size, NULL);
 	return list;
 }
 
-void free_eds_array_list(
+void eds_free_array_list(
 	struct eds_array_list **list,
-	const int size,
-	const free_eds_data free_function)
+	const int items_allocated,
+	const eds_free_data free_function)
 {
 	int i;
 
@@ -135,7 +177,7 @@ void free_eds_array_list(
 
 	if((*list)->data) {
 		if(free_function) {
-			for(i = 0; i < size; ++i) {
+			for(i = 0; i < items_allocated; ++i) {
 				if((*list)->data[i])
 					free_function((*list)->data[i]);
 			}
@@ -144,6 +186,69 @@ void free_eds_array_list(
 		free((*list)->data);
 	}
 
+	if((*list)->base)
+		eds_free_list_base(&(*list)->base);
+
 	free(*list);
 	*list = NULL;
+}
+
+union eds_list_container* eds_alloc_list_container(void)
+{
+	union eds_list_container *container = NULL;
+
+	container = (union eds_list_container*)malloc(
+		sizeof(union eds_list_container));
+	if(!container)
+		return container;
+
+	container->linked_list = NULL;
+	container->array_list = NULL;
+
+	return container;
+}
+
+void eds_free_list_container(
+	union eds_list_container **container,
+	const int list_type,
+	const eds_free_data free_function)
+{
+	if(!container || !(*container))
+		return;
+
+	if(!eds_is_list_type_valid(list_type))
+		return;
+
+	switch(list_type) {
+		case EDS_LINKED_LIST_TYPE:
+			if((*container)->linked_list)
+				eds_free_linked_list(&(*container)->linked_list, free_function);
+			break;
+
+		case EDS_ARRAY_LIST_TYPE:
+			if((*container)->array_list)
+				eds_free_array_list(
+					&(*container)->array_list,
+					(*container)->array_list->base->items_allocated,
+					free_function);
+			break;
+	}
+
+	free(*container);
+	*container = NULL;
+}
+
+const int eds_is_list_type_valid(const int type)
+{
+	switch(type) {
+		case EDS_NO_LIST_TYPE:
+		case EDS_LINKED_LIST_TYPE:
+		case EDS_ARRAY_LIST_TYPE:
+			return TRUE;
+
+		default:
+			break;
+	}
+
+	return FALSE;
 }

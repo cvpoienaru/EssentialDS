@@ -28,4 +28,24 @@
 #ifndef EDS_LINKED_LIST_H_
 #define EDS_LINKED_LIST_H_
 
+#include <list/list_defs.h>
+
+#define EDS_ADD_BEFORE_LIST_MODE 0
+#define EDS_ADD_AFTER_LIST_MODE 1
+
+const int eds_add_before_linked_list(
+	struct eds_linked_list *list,
+	struct eds_linked_list_node *node,
+	void *data);
+const int eds_add_after_linked_list(
+	struct eds_linked_list *list,
+	struct eds_linked_list_node *node,
+	void *data);
+const int eds_add_first_linked_list(
+	struct eds_linked_list *list,
+	void *data);
+const int eds_add_last_linked_list(
+	struct eds_linked_list *list,
+	void  *data);
+
 #endif /* EDS_LINKED_LIST_H_ */

@@ -37,12 +37,19 @@ usage()
 make_build()
 {
 	make -j $EDS_BUILD_THREADS -f $EDS_SRC/Makefile
+	find $EDS_SRC/test -iname makefile | while read file; do
+		make -j $EDS_BUILD_THREADS -f $file
+	done
 }
 
 clean_build()
 {
+	rm -rf $EDS_BIN/*
 	rm -rf $EDS_LIB/*
 	make -f $EDS_SRC/Makefile clean
+	find $EDS_SRC/test -iname makefile | while read file; do
+		make -j $EDS_BUILD_THREADS -f $file clean
+	done
 }
 
 # Check arguments

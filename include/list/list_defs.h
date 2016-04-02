@@ -30,6 +30,15 @@
 
 #include <defs.h>
 
+#define EDS_NO_LIST_TYPE 0
+#define EDS_LINKED_LIST_TYPE 1
+#define EDS_ARRAY_LIST_TYPE 2
+
+struct eds_list_base {
+	int items_used;
+	int items_allocated;
+};
+
 struct eds_linked_list_node {
 	struct eds_linked_list_node *prev;
 	struct eds_linked_list_node *next;
@@ -37,11 +46,13 @@ struct eds_linked_list_node {
 };
 
 struct eds_linked_list {
+	struct eds_list_base *base;
 	struct eds_linked_list_node *start;
 	struct eds_linked_list_node *end;
 };
 
 struct eds_array_list {
+	struct eds_list_base *base;
 	void **data;
 };
 
@@ -50,20 +61,31 @@ union eds_list_container {
 	struct eds_array_list *array_list;
 };
 
-struct eds_linked_list_node* alloc_eds_linked_list_node(void);
-void free_eds_linked_list_node(
+struct eds_list_base* eds_alloc_list_base(void);
+void eds_free_list_base(struct eds_list_base **base);
+
+struct eds_linked_list_node* eds_alloc_linked_list_node(void);
+void eds_free_linked_list_node(
 	struct eds_linked_list_node **node,
-	const free_eds_data free_function);
+	const eds_free_data free_function);
 
-struct eds_linked_list* alloc_eds_linked_list(void);
-void free_eds_linked_list(
+struct eds_linked_list* eds_alloc_linked_list(void);
+void eds_free_linked_list(
 	struct eds_linked_list **list,
-	const free_eds_data free_function);
+	const eds_free_data free_function);
 
-struct eds_array_list* alloc_eds_array_list(const int initial_size);
-void free_eds_array_list(
+struct eds_array_list* eds_alloc_array_list(const int initial_size);
+void eds_free_array_list(
 	struct eds_array_list **list,
-	const int size,
-	const free_eds_data free_function);
+	const int items_allocated,
+	const eds_free_data free_function);
+
+union eds_list_container* eds_alloc_list_container(void);
+void eds_free_list_container(
+	union eds_list_container **container,
+	const int list_type,
+	const eds_free_data free_function);
+
+const int eds_is_list_type_valid(const int type);
 
 #endif /* EDS_LIST_DEFS_H_ */

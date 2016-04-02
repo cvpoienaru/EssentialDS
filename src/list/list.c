@@ -33,89 +33,58 @@
 
 #include <stdlib.h>
 
-const int is_eds_list_type_valid(const int type)
-{
-	switch(type) {
-		case EDS_NO_LIST_TYPE:
-		case EDS_LINKED_LIST_TYPE:
-		case EDS_ARRAY_LIST_TYPE:
-			return TRUE;
-
-		default:
-			break;
-	}
-
-	return FALSE;
-}
-
-struct eds_list* alloc_eds_list(const int type)
+struct eds_list* eds_alloc_list(const int type)
 {
 	int status = EDS_FAILURE;
 	struct eds_list *list = NULL;
 
-	if(!is_eds_list_type_valid(type))
+	if(!eds_is_list_type_valid(type))
 		goto exit;
 
 	list = (struct eds_list*)malloc(sizeof(struct eds_list));
 	if(!list)
 		goto exit;
 
-	list->container = (union eds_list_container*)malloc(
-		sizeof(union eds_list_container));
+	list->container = eds_alloc_list_container();
 	if(!list->container)
 		goto exit;
 
 	switch(type) {
 		case EDS_LINKED_LIST_TYPE:
-			list->container->linked_list = alloc_eds_linked_list();
+			list->container->linked_list = eds_alloc_linked_list();
 			if(!list->container->linked_list)
 				goto exit;
 			break;
 
 		case EDS_ARRAY_LIST_TYPE:
-			list->container->array_list = alloc_eds_array_list(
-				EDS_INITIAL_SIZE);
+			list->container->array_list = eds_alloc_array_list(
+				EDS_LIST_INITIAL_SIZE);
 			if(!list->container->array_list)
 				goto exit;
 			break;
 	}
 
 	list->type = type;
-	list->items_used = EDS_INITIAL_SIZE;
-	list->items_allocated = EDS_INITIAL_SIZE;
 	list->free_function = NULL;
 
 	status = EDS_SUCCESS;
 
 exit:
-	if(status == EDS_FAILURE)
-		free_eds_list(&list);
+	if(list && status == EDS_FAILURE)
+		eds_free_list(&list);
 	return list;
 }
 
-void free_eds_list(struct eds_list **list)
+void eds_free_list(struct eds_list **list)
 {
 	if(!list || !(*list))
 		return;
 
-	if((*list)->container) {
-		switch((*list)->type) {
-			case EDS_LINKED_LIST_TYPE:
-				free_eds_linked_list(
-					&(*list)->container->linked_list,
-					(*list)->free_function);
-				break;
-
-			case EDS_ARRAY_LIST_TYPE:
-				free_eds_array_list(
-					&(*list)->container->array_list,
-					(*list)->items_allocated,
-					(*list)->free_function);
-				break;
-		}
-
-		free((*list)->container);
-	}
+	if((*list)->container)
+		eds_free_list_container(
+			&(*list)->container,
+			(*list)->type,
+			(*list)->free_function);
 
 	free(*list);
 	*list = NULL;
