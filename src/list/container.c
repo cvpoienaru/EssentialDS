@@ -25,52 +25,10 @@
  * possibility of such damage.
  */
 
-#include <list/list.h>
+#include <list/container.h>
 #include <defs.h>
 #include <list/list_defs.h>
 #include <list/linked_list.h>
 #include <list/array_list.h>
-#include <list/container.h>
 
 #include <stdlib.h>
-
-struct eds_list* eds_alloc_list(const int type)
-{
-	int status = EDS_FAILURE;
-	struct eds_list *list = NULL;
-
-	if(!eds_is_list_type_valid(type))
-		goto exit;
-
-	list = (struct eds_list*)malloc(sizeof(struct eds_list));
-	if(!list)
-		goto exit;
-
-	list->container = eds_alloc_list_container(type);
-	if(!list->container)
-		goto exit;
-
-	list->free_function = NULL;
-	list->compare_function = NULL;
-
-	status = EDS_SUCCESS;
-
-exit:
-	if(list && status == EDS_FAILURE)
-		eds_free_list(&list);
-	return list;
-}
-
-void eds_free_list(struct eds_list **list)
-{
-	if(!list || !(*list))
-		return;
-
-	if((*list)->container)
-		eds_free_list_container(
-			&(*list)->container,
-			(*list)->free_function);
-
-	free(*list);
-	*list = NULL;
-}

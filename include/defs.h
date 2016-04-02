@@ -37,5 +37,6 @@
 #define TRUE !(FALSE)
 
 typedef void (*eds_free_data)(void **data);
+typedef int (*eds_compare_data)(void *data1, void *data2);
 
 #endif /* EDS_DEFS_H_ */

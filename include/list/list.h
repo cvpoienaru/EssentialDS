@@ -30,13 +30,14 @@
 
 #include <defs.h>
 #include <list/list_defs.h>
-
-#define EDS_LIST_INITIAL_SIZE 0
+#include <list/linked_list.h>
+#include <list/array_list.h>
+#include <list/container.h>
 
 struct eds_list {
-	int type;
+	struct eds_list_container *container;
 	eds_free_data free_function;
-	union eds_list_container *container;
+	eds_compare_data compare_function;
 };
 
 struct eds_list* eds_alloc_list(const int type);

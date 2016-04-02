@@ -30,13 +30,15 @@
 
 #include <defs.h>
 
+#define EDS_LIST_INITIAL_SIZE (1<<4)
+
 #define EDS_NO_LIST_TYPE 0
 #define EDS_LINKED_LIST_TYPE 1
 #define EDS_ARRAY_LIST_TYPE 2
 
 struct eds_list_base {
-	int items_used;
 	int items_allocated;
+	int items_used;
 };
 
 struct eds_linked_list_node {
@@ -56,7 +58,8 @@ struct eds_array_list {
 	void **data;
 };
 
-union eds_list_container {
+struct eds_list_container {
+	int type;
 	struct eds_linked_list *linked_list;
 	struct eds_array_list *array_list;
 };
@@ -80,10 +83,9 @@ void eds_free_array_list(
 	const int items_allocated,
 	const eds_free_data free_function);
 
-union eds_list_container* eds_alloc_list_container(void);
+struct eds_list_container* eds_alloc_list_container(const int type);
 void eds_free_list_container(
-	union eds_list_container **container,
-	const int list_type,
+	struct eds_list_container **container,
 	const eds_free_data free_function);
 
 const int eds_is_list_type_valid(const int type);

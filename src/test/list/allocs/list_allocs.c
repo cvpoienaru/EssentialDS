@@ -29,7 +29,10 @@
 #include <list/list_defs.h>
 #include <list/linked_list.h>
 #include <list/array_list.h>
+#include <list/container.h>
 #include <list/list.h>
+
+#include <stdlib.h>
 
 void free_function(void **data)
 {

@@ -28,6 +28,7 @@
 #ifndef EDS_LINKED_LIST_H_
 #define EDS_LINKED_LIST_H_
 
+#include <defs.h>
 #include <list/list_defs.h>
 
 #define EDS_ADD_BEFORE_LIST_MODE 0

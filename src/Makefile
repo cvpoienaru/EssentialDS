@@ -33,6 +33,7 @@ EDS_LIB_OUT = $(EDS_LIB)/$(EDS_LIB_PREFIX)$(EDS_LIB_NAME).$(EDS_LIB_EXTENSION)
 EDS_SOURCES = $(EDS_LIB_SRC)/list/list_defs.c \
 	$(EDS_LIB_SRC)/list/array_list.c \
 	$(EDS_LIB_SRC)/list/linked_list.c \
+	$(EDS_LIB_SRC)/list/container.c \
 	$(EDS_LIB_SRC)/list/list.c
 EDS_OBJECTS = $(EDS_SOURCES:.c=.o)
 

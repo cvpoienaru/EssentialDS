@@ -28,4 +28,7 @@
 #ifndef EDS_ARRAY_LIST_H_
 #define EDS_ARRAY_LIST_H_
 
+#include <defs.h>
+#include <list/list_defs.h>
+
 #endif /* EDS_ARRAY_LIST_H_ */

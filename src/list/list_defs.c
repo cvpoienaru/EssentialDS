@@ -38,8 +38,8 @@ struct eds_list_base* eds_alloc_list_base(void)
 	if(!base)
 		return base;
 
-	base->items_used = 0;
 	base->items_allocated = 0;
+	base->items_used = 0;
 
 	return base;
 }
@@ -193,33 +193,58 @@ void eds_free_array_list(
 	*list = NULL;
 }
 
-union eds_list_container* eds_alloc_list_container(void)
+struct eds_list_container* eds_alloc_list_container(const int type)
 {
-	union eds_list_container *container = NULL;
+	int status = EDS_FAILURE;
+	struct eds_list_container *container = NULL;
 
-	container = (union eds_list_container*)malloc(
-		sizeof(union eds_list_container));
+	if(!eds_is_list_type_valid(type))
+		goto exit;
+
+	container = (struct eds_list_container*)malloc(
+		sizeof(struct eds_list_container));
 	if(!container)
-		return container;
+		goto exit;
 
-	container->linked_list = NULL;
-	container->array_list = NULL;
+	switch(type) {
+		case EDS_LINKED_LIST_TYPE:
+			container->linked_list = eds_alloc_linked_list();
+			if(!container->linked_list)
+				goto exit;
 
+			container->array_list = NULL;
+			break;
+
+		case EDS_ARRAY_LIST_TYPE:
+			container->array_list = eds_alloc_array_list(EDS_LIST_INITIAL_SIZE);
+			if(!container->array_list)
+				goto exit;
+
+			container->linked_list = NULL;
+			break;
+
+		default:
+			goto exit;
+	}
+
+	container->type = type;
+
+	status = EDS_SUCCESS;
+
+exit:
+	if(container && status == EDS_FAILURE)
+		eds_free_list_container(&container, NULL);
 	return container;
 }
 
 void eds_free_list_container(
-	union eds_list_container **container,
-	const int list_type,
+	struct eds_list_container **container,
 	const eds_free_data free_function)
 {
 	if(!container || !(*container))
 		return;
 
-	if(!eds_is_list_type_valid(list_type))
-		return;
-
-	switch(list_type) {
+	switch((*container)->type) {
 		case EDS_LINKED_LIST_TYPE:
 			if((*container)->linked_list)
 				eds_free_linked_list(&(*container)->linked_list, free_function);
