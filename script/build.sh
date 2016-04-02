@@ -34,6 +34,12 @@ usage()
 	exit 0
 }
 
+make_build_directories()
+{
+	mkdir -p $EDS_BIN
+	mkdir -p $EDS_LIB
+}
+
 make_build()
 {
 	make -j $EDS_BUILD_THREADS -f $EDS_SRC/Makefile
@@ -64,6 +70,7 @@ while [[ $# > 0 ]]; do
 			usage
 		;;
 		--build|-b)
+			make_build_directories
 			make_build
 		;;
 		--clean|-c)

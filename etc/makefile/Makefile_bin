@@ -1,5 +1,3 @@
-#!/bin/bash
-
 # Copyright (c) 2016, Codrin-Victor Poienaru <cvpoienaru@gmail.com>.
 # All rights reserved.
 #
@@ -24,28 +22,29 @@
 # or tort (including negligence or otherwise) arising in any way out of the use
 # of this software, even if advised of the possibility of such damage.
 
-# Directory structure
-export EDS_ROOT=~/Projects/EssentialDS
-export EDS_BIN=$EDS_ROOT/bin
-export EDS_ETC=$EDS_ROOT/etc
-export EDS_INCLUDE=$EDS_ROOT/include
-export EDS_LIB=$EDS_ROOT/lib
-export EDS_SCRIPT=$EDS_ROOT/script
-export EDS_SRC=$EDS_ROOT/src
+# Binary options
+EDS_BIN_NAME =
+EDS_BIN_PREFIX = eds
+EDS_BIN_SRC =
+EDS_BIN_OUT = $(EDS_BIN)/$(EDS_BIN_PREFIX)_$(EDS_BIN_NAME)
 
-# Environment paths
-export C_INCLUDE_PATH=$EDS_INCLUDE
-export LIBRARY_PATH=$EDS_LIB
-export LD_LIBRARY_PATH=$EDS_LIB
+# Binary source & object files
+EDS_SOURCES =
+EDS_OBJECTS = $(EDS_SOURCES:.c=.o)
 
-# File system permission mask
-export EDS_MASK=0022
+# Compiler options
+CC = gcc
+CFLAGS = -Wall -O3 $(EDS_FLAGS)
+LFLAGS = -lessentialds
 
-# Build options
-export EDS_DEBUG=true
-export EDS_BUILD_THREADS=16
+all: $(EDS_SOURCES) $(EDS_BIN_OUT)
 
-unset EDS_FLAGS
-if $EDS_DEBUG; then
-	export EDS_FLAGS=-g
-fi
+$(EDS_BIN_OUT): $(EDS_OBJECTS)
+	$(CC) $^ -o $@ $(LFLAGS)
+
+.c.o:
+	$(CC) $(CFLAGS) $< -c -o $@ $(LFLAGS)
+
+.PHONY: clean
+clean:
+	rm -rf $(EDS_BIN_SRC)/*.o
