@@ -40,6 +40,7 @@ struct eds_list_base* eds_alloc_list_base(void)
 
 	base->items_allocated = 0;
 	base->items_used = 0;
+	base->last_item = 0;
 
 	return base;
 }
@@ -156,6 +157,7 @@ struct eds_array_list* eds_alloc_array_list(const int initial_size)
 		goto exit;
 
 	list->base->items_allocated = initial_size;
+	list->is_compact = TRUE;
 
 	status = EDS_SUCCESS;
 
@@ -222,9 +224,6 @@ struct eds_list_container* eds_alloc_list_container(const int type)
 
 			container->linked_list = NULL;
 			break;
-
-		default:
-			goto exit;
 	}
 
 	container->type = type;
@@ -244,29 +243,82 @@ void eds_free_list_container(
 	if(!container || !(*container))
 		return;
 
-	switch((*container)->type) {
-		case EDS_LINKED_LIST_TYPE:
-			if((*container)->linked_list)
-				eds_free_linked_list(&(*container)->linked_list, free_function);
-			break;
+	if(!eds_is_list_type_valid((*container)->type)) {
+		switch((*container)->type) {
+			case EDS_LINKED_LIST_TYPE:
+				if((*container)->linked_list)
+					eds_free_linked_list(
+						&(*container)->linked_list,
+						free_function);
+				break;
 
-		case EDS_ARRAY_LIST_TYPE:
-			if((*container)->array_list)
-				eds_free_array_list(
-					&(*container)->array_list,
-					(*container)->array_list->base->items_allocated,
-					free_function);
-			break;
+			case EDS_ARRAY_LIST_TYPE:
+				if((*container)->array_list)
+					eds_free_array_list(
+						&(*container)->array_list,
+						(*container)->array_list->base->items_allocated,
+						free_function);
+				break;
+		}
 	}
 
 	free(*container);
 	*container = NULL;
 }
 
+struct eds_list_range_item *eds_alloc_list_range_item(
+	const int index,
+	void *data)
+{
+	struct eds_list_range_item *item = NULL;
+
+	if(index < 0)
+		return item;
+
+	item = (struct eds_list_range_item*)malloc(
+		sizeof(struct eds_list_range_item));
+	if(!item)
+		return item;
+
+	item->index = index;
+	item->data = data;
+
+	return item;
+}
+
+struct eds_list_range_item *eds_alloc_empty_list_range_item(void)
+{
+	return eds_alloc_list_range_item(EDS_NO_LIST_INDEX, NULL);
+}
+
+void eds_free_list_range_item(
+	struct eds_list_range_item **item,
+	const eds_free_data free_function)
+{
+	if(!item || !(*item))
+		return;
+
+	if(free_function && (*item)->data)
+		free_function(&(*item)->data);
+
+	free(*item);
+	*item = NULL;
+}
+
+inline int eds_compare_list_range_item(const void *data1, const void *data2)
+{
+	struct eds_list_range_item *item1 = NULL;
+	struct eds_list_range_item *item2 = NULL;
+
+	item1 = *(struct eds_list_range_item* const*)data1;
+	item2 = *(struct eds_list_range_item* const*)data2;
+
+	return item1->index - item2->index;
+}
+
 inline const int eds_is_list_type_valid(const int type)
 {
 	switch(type) {
-		case EDS_NO_LIST_TYPE:
 		case EDS_LINKED_LIST_TYPE:
 		case EDS_ARRAY_LIST_TYPE:
 			return TRUE;

@@ -82,6 +82,7 @@ static const int eds_add_general_linked_list(
 first_node_exit:
 	++(list->base->items_allocated);
 	list->base->items_used = list->base->items_allocated;
+	list->base->last_item = list->base->items_allocated;
 
 	ret = EDS_SUCCESS;
 
@@ -139,5 +140,8 @@ const int eds_add_last_linked_list(
 	struct eds_linked_list *list,
 	void  *data)
 {
+	if(!list)
+		return EDS_FAILURE;
+
 	return eds_add_after_linked_list(list, list->end, data);
 }

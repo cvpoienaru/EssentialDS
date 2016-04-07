@@ -40,7 +40,7 @@ EDS_OBJECTS = $(EDS_SOURCES:.c=.o)
 # Compiler options
 CC = gcc
 CFLAGS = -Wall -O3 $(EDS_FLAGS)
-LFLAGS =
+LFLAGS = -lm
 
 all: $(EDS_SOURCES) $(EDS_LIB_OUT)
 
@@ -48,7 +48,7 @@ $(EDS_LIB_OUT): $(EDS_OBJECTS)
 	$(CC) $^ -shared -o $@ $(LFLAGS)
 
 .c.o:
-	$(CC) $(CFLAGS) -fPIC $< -c -o $@ $(LFLAGS)
+	$(CC) $(CFLAGS) -fPIC $< -c -o $@
 
 .PHONY: clean
 clean:

@@ -31,14 +31,15 @@
 #include <defs.h>
 
 #define EDS_LIST_INITIAL_SIZE (1<<4)
+#define EDS_NO_LIST_INDEX -1
 
-#define EDS_NO_LIST_TYPE 0
-#define EDS_LINKED_LIST_TYPE 1
-#define EDS_ARRAY_LIST_TYPE 2
+#define EDS_LINKED_LIST_TYPE 0
+#define EDS_ARRAY_LIST_TYPE 1
 
 struct eds_list_base {
 	int items_allocated;
 	int items_used;
+	int last_item;
 };
 
 struct eds_linked_list_node {
@@ -56,12 +57,18 @@ struct eds_linked_list {
 struct eds_array_list {
 	struct eds_list_base *base;
 	void **data;
+	int is_compact;
 };
 
 struct eds_list_container {
 	int type;
 	struct eds_linked_list *linked_list;
 	struct eds_array_list *array_list;
+};
+
+struct eds_list_range_item {
+	int index;
+	void *data;
 };
 
 struct eds_list_base* eds_alloc_list_base(void);
@@ -88,6 +95,15 @@ void eds_free_list_container(
 	struct eds_list_container **container,
 	const eds_free_data free_function);
 
+struct eds_list_range_item *eds_alloc_list_range_item(
+	const int index,
+	void *data);
+struct eds_list_range_item *eds_alloc_empty_list_range_item(void);
+void eds_free_list_range_item(
+	struct eds_list_range_item **item,
+	const eds_free_data free_function);
+
+inline int eds_compare_list_range_item(const void *data1, const void *data2);
 inline const int eds_is_list_type_valid(const int type);
 
 #endif /* EDS_LIST_DEFS_H_ */

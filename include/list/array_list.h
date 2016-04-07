@@ -31,4 +31,13 @@
 #include <defs.h>
 #include <list/list_defs.h>
 
+const int eds_add_array_list_range(
+	struct eds_array_list *list,
+	struct eds_list_range_item **items,
+	const int items_allocated);
+const int eds_add_array_list_index(
+	struct eds_array_list *list,
+	const int index,
+	void *data);
+
 #endif /* EDS_ARRAY_LIST_H_ */
