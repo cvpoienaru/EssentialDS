@@ -47,4 +47,4 @@ $(EDS_BIN_OUT): $(EDS_OBJECTS)
 
 .PHONY: clean
 clean:
-	rm -rf $(EDS_BIN_SRC)/*.o
+	rm $(EDS_BIN_SRC)/*.o

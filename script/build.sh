@@ -50,8 +50,8 @@ make_build()
 
 clean_build()
 {
-	rm -rf $EDS_BIN/*
-	rm -rf $EDS_LIB/*
+	rm -rf $EDS_BIN
+	rm -rf $EDS_LIB
 	make -f $EDS_SRC/Makefile clean
 	find $EDS_SRC/test -iname makefile | while read file; do
 		make -j $EDS_BUILD_THREADS -f $file clean
